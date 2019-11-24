@@ -1,0 +1,16 @@
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('1', 'team1', 'team1', '0', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('2', 'team2', 'team2', '0', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('3', 'team3', 'team3', '0', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('4', 'team4', 'team4', '0', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('5', 'team5', 'team5', '0', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('6', 'team6', 'team6', '0', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('7', 'team1', 'team1', '0', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('8', 'team1', 'team1', '0', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('9', 'team9', 'team9', '10', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('10', 'team10', 'team10', '10', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('11', 'team11', 'team11', '10', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('12', 'team12', 'team12', '10', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('13', 'team13', 'team13', '10', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('14', 'team14', 'team14', '10', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('15', 'team15', 'team15', '10', '0');
+INSERT INTO `teams` (`id`, `login_id`, `pass`, `point`, `flg`) VALUES ('16', 'team16', 'team16', '10', '0');
