@@ -7,7 +7,7 @@ require('func.php');
 
 
 if(empty($_SESSION['id'])){
-  header('Locationlogin.php');
+  header('Location:login.php');
 }
 
 $pdo = pdo();
@@ -141,6 +141,15 @@ if(isset($_POST)){
       $stmt = $pdo->prepare($sql);
       $stmt->bindParam(':id', $_GET['id']);
       $stmt->execute();
+
+      $sql = ' UPDATE bets SET '
+              .' flg = 0 '
+              .'WHERE quiz_id = :id '
+      ;
+      $stmt = $pdo->prepare($sql);
+      $stmt->bindParam(':id', $_GET['id']);
+      $stmt->execute();
+
       unset($_SESSION['flg']);
       unset($_SESSION['quiz_id']);
       echo '問題'.$_GET['id'].'の解除完了';
@@ -150,6 +159,10 @@ if(isset($_POST)){
 //全クイズの取得　表示用
 $stmt = $pdo->query ( 'select * from quiz');
 $quizs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//全チーム取得　表示用
+$stmt = $pdo->query ( 'select * from teams');
+$all_team = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 //リアルタイムの問題と答えの状態を表示するための処理
 $stmt = $pdo->query ( 'select * from quiz where flg = 1' );
@@ -174,6 +187,25 @@ $teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
 //     $data  .= $answer.$bet;
 //   }
 // }
+
+
+if(isset($_POST["add"])){
+  $stmt= $pdo->query ( 'select * from teams where id = '.'\''.$_POST['win'].'\'');
+  $team = $stmt->fetch(PDO::FETCH_ASSOC);
+    $point = $team['point'] + 2;
+
+  //ポイント反映しまーす
+  $sql = ' UPDATE teams SET '
+          .'  point = :point '
+          .'WHERE id = :team '
+  ;
+
+  $stmt = $pdo->prepare($sql);
+  $stmt->bindParam(':point', $point);
+  $stmt->bindParam(':team', $_POST['win']);
+  $stmt->execute();
+}
+
 
 //リセット処理
 if(isset($_POST["reset"])){
@@ -219,6 +251,7 @@ if(isset($_POST["reset"])){
 </form>
 <?php endforeach ; ?>
 
+<h4>集計ボタン</h4>
 <form action="syuukei.php" method="post">
   <input type="hidden" name="quiz_id" value="<?=$quiz['id']?>">
   <input type="hidden" name="answer" value="<?=(isset($quiz['answer']) ? $quiz['answer'] : '') ?>">
@@ -226,6 +259,19 @@ if(isset($_POST["reset"])){
   <input type="submit" name="calc" value="集計">
 </form>
 
+<h4>ポイント追加ボタン</h4>
+<form action="" method="post">
+  <select name="win">
+    <?php foreach($all_team as $v):?>
+      <option value="<?=$v['id'] ?>"><?=$v['id'] ?></option>
+  <?php endforeach; ?>
+  </select>
+  <input type="submit" name="add" value="勝利チームにポイント追加">
+</form>
+
+<h4>リセットボタン</h4>
 <form action="" method="post" onclick="return confirm('リセットしてもいいよね？');">
   <input type="submit" name="reset" value="ぜーんぶリセット">
 </form>
+
+<a href="result.php">結果へphp</a>
