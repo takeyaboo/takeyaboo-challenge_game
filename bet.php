@@ -171,7 +171,7 @@ h1{
   <nav class="navbar navbar-expand navbar-dark bg-primary">
     <!-- <a href="" class="navbar-brand"></a> -->
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item"><a href="" class="nav-link"><a href="" class="text-light">・ページを再読込</a></li>
+      <li class="nav-item"><a href="" class="nav-link"><a href="" class="text-light">・再読込</a></li>
       <li class="nav-item"><a href="" class="nav-link"><a href="result.php" class="text-light pl-3">・結果ページへ</a></li>
       <li class="nav-item"><a href="" class="nav-link"><a href="logout.php" class="text-light pl-3">・ログアウト</a><li/>
       <!-- <input type="button" value="ページを再読込" onclick="window.location.reload();" /> -->
