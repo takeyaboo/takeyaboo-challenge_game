@@ -61,7 +61,7 @@ $teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php foreach($teams as $key => $team):?>
       <!-- フラグが立ってる問題に対してベットしたとこのチーム名が出る -->
       <?php $key += 1 ?>
-        <p><?= $key.'位:チーム'.$team['id'].'/'.$team['point'].'ポイント'?></p><hr>
+        <p><?= $key.'位:チーム'.$team['id']?><span class="pl-5"><?= $team['point'].'ポイント'?></span></p><hr>
     <?php endforeach;?>
   </div>
 </div>

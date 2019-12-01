@@ -14,54 +14,74 @@ if(empty($_SESSION['id'])){
 
 $pdo = pdo();
 
+//クイズの状態表示用
+$stmt = $pdo->query( 'select * from quiz where flg = 1');
+$quiz = $stmt->fetch(PDO::FETCH_ASSOC);
+
 if(isset($_POST['submit'])){
+  //問題が登録されているかチェック
   if($_POST["quiz_id"] != ""){
-    if(isset($_POST['answer']) && isset($_POST['bet'])){
-      //クイズとチームに対応する情報(bet)を取得
-      $stmt = $pdo->query( 'select * from bets where quiz_id = '. $_POST["quiz_id"] .' and team ='. $_POST["team_id"]);
-      $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    //画面上に表示されているクイズと実際に登録されている問題が一致しているかチェック
+    if($_POST["quiz_id"] == $quiz['id']){
+      if(isset($_POST['answer']) && isset($_POST['bet'])){
+        //クイズとチームに対応する情報(bet)を取得
+        $stmt = $pdo->query( 'select * from bets where quiz_id = '. $_POST["quiz_id"] .' and team ='. $_POST["team_id"]);
+        //本来一レコードだけしか取らないが例外に備えて後々処理するために複数取れるようにする
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        //何らかの原因で同じチームが同じクイズに複数ベットしていた場合、一つでもflgが立っているものがあればフラグON
+        //仮に一個めが集計済みだったとしても二個目以降はflgが解除されていないと想定（ブラウザバック等の二重送信防止対策）
+        $flg = 0;
+        foreach ($result as $v) {
+          if($v['flg'] == '1'){
+            $flg = 1;
+            break;
+          }
+        }
 
-      //フラグが立っていたら挿入できないようにする
-      //立ってたらどの問題に対してどのチームがどの答えにいくら賭けたか挿入
-      if($result['flg'] != '1'){
-        $sql = 'INSERT INTO bets('
-            . '  team '
-            . ', bet '
-            . ', quiz_id '
-            . ', answer '
-            . ', flg '
-          . ' )VALUES( '
-            . '  :team '
-            . ', :bet '
-            . ', :quiz_id '
-            . ', :answer '
-            . ', 1 '
-          . ' ) '
-        ;
+        //フラグが立っていたら挿入できないようにする
+        //立ってたらどの問題に対してどのチームがどの答えにいくら賭けたか挿入
+        if($flg != 1){
+          $sql = 'INSERT INTO bets('
+              . '  team '
+              . ', bet '
+              . ', quiz_id '
+              . ', answer '
+              . ', flg '
+            . ' )VALUES( '
+              . '  :team '
+              . ', :bet '
+              . ', :quiz_id '
+              . ', :answer '
+              . ', 1 '
+            . ' ) '
+          ;
 
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':team', $_POST['team_id']);
-        $stmt->bindParam(':bet', $_POST['bet']);
-        $stmt->bindParam(':quiz_id', $_POST['quiz_id']);
-        $stmt->bindParam(':answer', $_POST['answer']);
-        $stmt->execute();
-        // print_r($result);
-        // print_r($_POST);
+          $stmt = $pdo->prepare($sql);
+          $stmt->bindParam(':team', $_POST['team_id']);
+          $stmt->bindParam(':bet', $_POST['bet']);
+          $stmt->bindParam(':quiz_id', $_POST['quiz_id']);
+          $stmt->bindParam(':answer', $_POST['answer']);
+          $stmt->execute();
+          // print_r($result);
+          // print_r($_POST);
+        }else{
+          $err = 'あなた方チーム'.$result[0]['team'].'は'.'クイズ'.$result[0]['quiz_id'].'に'.$result[0]['bet'].'bet済みです!!';
+        }
       }else{
-        $err = 'あなた方チーム'.$result['team'].'は'.'クイズ'.$result['quiz_id'].'に'.$result['bet'].'bet済みです!!';
+        $err = '答えが未選択です!!';
       }
     }else{
-      $err = '答えが未選択です!!';
+      $err = '今出題されている問題がこの画面上で反映されていなかったので反映しました!!';
     }
+  }else{
+    $err = '問題がまだ発表されていません!!';
   }
 }
 
 // echo $_POST['bet'];
 
-//クイズの状態表示用
-$stmt = $pdo->query( 'select * from quiz where flg = 1');
-$quiz = $stmt->fetch(PDO::FETCH_ASSOC);
+
 
 //自分のチームの状態表示用
 $id = $_SESSION['id'];
@@ -70,7 +90,7 @@ $team = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // ベット後に一回ログアウトして(しないと思うけど)ログインし直しても「あれ？あれ？ってならないように」ベットした数が表示されるようにわざわざ書いてる
 if(isset($quiz) && isset($team)){
-  $stmt = $pdo->query( 'select * from bets where team = \''.$team['id'].'\' and quiz_id = \''.$quiz['id'].'\'');
+  $stmt = $pdo->query( 'select * from bets where team = \''.$team['id'].'\' and quiz_id = \''.$quiz['id'].'\' and flg = 1');
   $bet = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
@@ -151,7 +171,10 @@ h1{
   <nav class="navbar navbar-expand navbar-dark bg-primary">
     <!-- <a href="" class="navbar-brand"></a> -->
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item"><a href="" class="nav-link"><a href="./logout.php" class="text-light">ログアウト</a><li/>
+      <li class="nav-item"><a href="" class="nav-link"><a href="" class="text-light">・ページを再読込</a></li>
+      <li class="nav-item"><a href="" class="nav-link"><a href="result.php" class="text-light pl-3">・結果ページへ</a></li>
+      <li class="nav-item"><a href="" class="nav-link"><a href="logout.php" class="text-light pl-3">・ログアウト</a><li/>
+      <!-- <input type="button" value="ページを再読込" onclick="window.location.reload();" /> -->
     </ul>
   </nav>
   <div class="container my-0 mx-auto">
@@ -173,7 +196,7 @@ h1{
           <?php endif ; ?>
           </div>
       </div>
-      <div class="pt-3 text-center">
+      <div id="container2" class="pt-3 text-center" style="display:none">
         <h4 class="alert alert-secondary">答えとベット数を選んで<br>送信してください</h4><br>
         <!-- <div class="text-left w-50 mx-auto"> -->
           <label for="A"><span class="badge badge-secondary" style="font-weight:bold;">答え</span>A</label>
@@ -198,13 +221,23 @@ h1{
   </div>
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
   <script>
+
+  //ブラウザバックしたら強制リロード
+  window.onpageshow = function(event) {
+  	if (event.persisted) {
+  		 window.location.reload(true);
+  	}
+  };
+
+
   $(function() {
   //   $('h1').fadeIn(2000, function(){
   //     $(this).addClass('title');
   //     });
   // });
   $('h1').fadeIn(2100);
-  $('#container').show(1000)
+  $('#container').fadeIn(1000);
+  $('#container2').fadeIn(1000);
 });
   </script>
 </body>

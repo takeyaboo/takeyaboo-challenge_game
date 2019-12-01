@@ -8,65 +8,58 @@ require('func.php');
 
 if(empty($_SESSION['id'])){
   header('Location:login.php');
+}else{
+  if($_SESSION['id'] !== 'oreore'){
+    header('Location:login.php');
+
+  }
 }
 
 $pdo = pdo();
 
-for($i = 1; $i <= 30; $i++){
-  foreach ($pdo->query ( 'select * from bets' ) as $val){
-    if($val['team'] == $i){
-      $teams[] = $val['team'];
-      break;
-    }
-  }
-}
+//全クイズの取得　表示用
+$stmt = $pdo->query ( 'select * from quiz');
+$quizs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//全チーム取得　表示用
+//追加ポイント処理のため
+$stmt = $pdo->query ( 'select * from teams');
+$all_team = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//リアルタイムの問題と答えの状態を表示するための処理
+$stmt = $pdo->query ( 'select * from quiz where flg = 1' );
+$quiz = $stmt->fetch(PDO::FETCH_ASSOC);
+// print_r($quiz);
+
+
+// 全チームがベットしたのを確認するためにどこがベットしたか表示させる処理
+// まあどうせsyuukei.phpで全チームがベットしないと集計できないようにしてるけど
+
+$stmt = $pdo->query ( 'select * from bets where flg = 1 order by team asc' );
+$teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// print_r($teams);
+
+
+// for($i = 1; $i <= 16; $i++){
+//   foreach ($pdo->query ( 'select * from bets' ) as $val){
+//     if($val['team'] == $i){
+//       $teams[] = $val['team'];
+//       break;
+//     }
+//   }
+// }
 
 // print_r($teams);
 
 
 
-echo "<a href='./logout.php'>ログアウトはこちら。</a>";
+echo "<a href='logout.php'>ログアウトはこちら。</a>";
 
 //久々にORANGE RANGE聴くと良さある
 
 if(isset($_POST)){
   //登録ボタン押したら
   if(isset($_POST['regist'])){
-    // //登録されてるクイズないか確認して
-    // foreach ($pdo->query ( 'select * from quiz' ) as $val){
-    //   if($val['flg'] == 1){
-    //     //あったらその問題のidをセッションに格納して
-    //     $_SESSION['flg'] = 1;
-    //     $_SESSION['quiz_id'] = $val['id'];
-    //   }
-    // }
-    // //セッションに問題が入ってなかったら登録された問題にフラグ立てる
-    // //フラグが立つと全チームの画面に問題とレアリティが表示される
-    // if(empty($_SESSION['flg'])){
-    //   $sql = ' UPDATE quiz SET '
-    //           .' flg = 1 '
-    //           .'WHERE id = :id '
-    //   ;
-    //
-    //   $stmt = $pdo->prepare($sql);
-    //   $stmt->bindParam(':id', $_GET['id']);
-    //   $stmt->execute();
-    // }else{
-    //   echo 'どっかのフラグが解除されてない';
-    // }
-
-
-      //登録されてるクイズないか確認して
-      // foreach ($pdo->query ( 'select * from quiz' ) as $val){
-      //   if($val['flg'] == 1){
-      //     //あったらその問題のidをセッションに格納して
-      //     $_SESSION['flg'] = 1;
-      //     $_SESSION['quiz_id'] = $val['id'];
-      //   }
-      // }
-      //セッションに問題が入ってなかったら登録された問題にフラグ立てる
-      //フラグが立つと全チームの画面に問題とレアリティが表示される
-
       //全クイズのフラグを取得
       $stmt = $pdo->query( 'select flg from quiz' );
       $result = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -91,8 +84,8 @@ if(isset($_POST)){
         $stmt->execute();
 
 
-        $_SESSION['flg'] = 1;
-        $_SESSION['quiz_id'] = $_GET['id'];
+        // $_SESSION['flg'] = 1;
+        // $_SESSION['quiz_id'] = $_GET['id'];
 
       }else{
         echo 'どっかのフラグが解除されてない';
@@ -102,9 +95,14 @@ if(isset($_POST)){
     //正解が登録されたら
     if(isset($_POST['correct'])){
       //問題がちゃんと登録されてることを確認して
-      if(!empty($_SESSION['flg']) && !empty($_SESSION['quiz_id'])){
+      // $stmt = $pdo->query ( 'select * from quiz where flg = 1' );
+      // $quiz = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      // if(!empty($_SESSION['flg']) && !empty($_SESSION['quiz_id'])){
+      if(!empty($quiz['flg']) && !empty($quiz['id'])){
+
         //念の為その問題と元々登録されてた問題が一致してるか確認して
-        if($_SESSION['quiz_id'] == $_GET['id']){
+        if($quiz['id'] == $_GET['id']){
 
           //大丈夫だったらその問題に対して答えを定義ウェーイ
 
@@ -150,32 +148,13 @@ if(isset($_POST)){
       $stmt->bindParam(':id', $_GET['id']);
       $stmt->execute();
 
-      unset($_SESSION['flg']);
-      unset($_SESSION['quiz_id']);
+      // unset($_SESSION['flg']);
+      // unset($_SESSION['quiz_id']);
       echo '問題'.$_GET['id'].'の解除完了';
     }
 }
 
-//全クイズの取得　表示用
-$stmt = $pdo->query ( 'select * from quiz');
-$quizs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-//全チーム取得　表示用
-$stmt = $pdo->query ( 'select * from teams');
-$all_team = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-//リアルタイムの問題と答えの状態を表示するための処理
-$stmt = $pdo->query ( 'select * from quiz where flg = 1' );
-$quiz = $stmt->fetch(PDO::FETCH_ASSOC);
-// print_r($quiz);
-
-
-// 全チームがベットしたのを確認するためにどこがベットしたか表示させる処理
-// まあどうせsyuukei.phpで全チームがベットしないと集計できないようにしてるけど
-
-$stmt = $pdo->query ( 'select * from bets where flg = 1 order by team asc' );
-$teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
-// print_r($teams);
 
 //集計データ
 

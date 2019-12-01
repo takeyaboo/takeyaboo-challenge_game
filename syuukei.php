@@ -44,8 +44,8 @@ if(isset($_POST['calc'])){
             .' answer = null'
             .' WHERE id = '.'\''.$_POST['quiz_id'].'\'';
     $pdo->exec($sql);
-    unset($_SESSION['flg']);
-    unset($_SESSION['quiz_id']);
+    // unset($_SESSION['flg']);
+    // unset($_SESSION['quiz_id']);
 
     //ベットのフラグを解除する
     $sql = ' UPDATE bets SET flg = 0 WHERE quiz_id = '.'\''.$_POST['quiz_id'].'\'';

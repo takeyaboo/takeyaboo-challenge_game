@@ -23,26 +23,31 @@ if(isset($_POST['submit'])){
   } catch (Exception $e) {
     echo $e->getMessage() . PHP_EQL;
   }
+
   // echo $_POST['id'];
   // print_r($result);
+    if($result['login_id'] === $_POST['id'] && $result['pass'] === $_POST['pass']){
+      //多重ログイン防止
+      if($result['flg'] == 0){
+        $_SESSION['id'] = $result['login_id'];
+        $_SESSION['pass'] = $result['pass'];
+        // $_SESSION['auth'] = 1;
 
-  if($result['login_id'] === $_POST['id'] && $result['pass'] === $_POST['pass']){
-    $_SESSION['id'] = $result['login_id'];
-    $_SESSION['pass'] = $result['pass'];
-    // $_SESSION['auth'] = 1;
+        $sql = 'UPDATE teams SET flg = 1 WHERE login_id = '.'\''.$_SESSION['id'].'\'';
+        $pdo->exec($sql);
 
-    $sql = 'UPDATE teams SET flg = 1 WHERE login_id = '.'\''.$_SESSION['id'].'\'';
-    $pdo->exec($sql);
-
-    if($_SESSION['id'] == 'oreore' && $_SESSION['pass'] == 'takeba'){
-      header('Location: admin.php');
-      exit;
+        if($_SESSION['id'] == 'oreore' && $_SESSION['pass'] == 'takeba'){
+          header('Location: admin.php');
+          exit;
+        }
+        header('Location: bet.php');
+        exit;
+      }else{
+        $err = '既にログインされています';
+      }
+    }else{
+      $err = 'ログイン失敗';
     }
-    header('Location: bet.php');
-    exit;
-  }else{
-    // echo 'ログイン失敗';
-  }
 }
 
 ?>
@@ -303,7 +308,7 @@ if(isset($_POST['submit'])){
 <body>
   <div class="wrapper fadeInDown">
     <div id="formContent">
-      <p class="lead">ログインをお願いします</p>
+      <p class="lead <?=(isset($err) ? "alert-danger" : "")?>"><?=(isset($err) ? $err : "ログインしてください")?></p>
         <form action="" method="post">
           <!-- <label for="#id">ID</label><br> -->
           <input type="text" id="id" class="fadeIn second" name="id" value="" placeholder="IDを入力してください">
