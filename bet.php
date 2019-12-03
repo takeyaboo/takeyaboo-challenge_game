@@ -18,6 +18,7 @@ $pdo = pdo();
 $stmt = $pdo->query( 'select * from quiz where flg = 1');
 $quiz = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
 if(isset($_POST['submit'])){
   //問題が登録されているかチェック
   if($_POST["quiz_id"] != ""){
@@ -63,6 +64,25 @@ if(isset($_POST['submit'])){
           $stmt->bindParam(':quiz_id', $_POST['quiz_id']);
           $stmt->bindParam(':answer', $_POST['answer']);
           $stmt->execute();
+
+
+
+
+          // $id = $_SESSION['id'];
+          // $stmt = $pdo->query( 'select * from teams where login_id = \''.$id.'\'');
+          // $team = $stmt->fetch(PDO::FETCH_ASSOC);
+          //
+          // $point = $team['point'] - $_POST['bet'];
+          //
+          // $sql = ' UPDATE teams SET '
+          //         .'  point = :point '
+          //         .'WHERE id = :team '
+          // ;
+          // $stmt = $pdo->prepare($sql);
+          // $stmt->bindParam(':point', $point);
+          // $stmt->bindParam(':team', $_POST['team_id']);
+          // $stmt->execute();
+
           // print_r($result);
           // print_r($_POST);
         }else{
@@ -81,17 +101,21 @@ if(isset($_POST['submit'])){
 
 // echo $_POST['bet'];
 
-
-
 //自分のチームの状態表示用
 $id = $_SESSION['id'];
 $stmt = $pdo->query( 'select * from teams where login_id = \''.$id.'\'');
 $team = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
 // ベット後に一回ログアウトして(しないと思うけど)ログインし直しても「あれ？あれ？ってならないように」ベットした数が表示されるようにわざわざ書いてる
 if(isset($quiz) && isset($team)){
   $stmt = $pdo->query( 'select * from bets where team = \''.$team['id'].'\' and quiz_id = \''.$quiz['id'].'\' and flg = 1');
   $bet = $stmt->fetch(PDO::FETCH_ASSOC);
+  $disp = $bet['bet'] * 2;
+}
+
+if(isset($_POST['reload'])){
+  $quiz_flg = "まだ次のクイズが発表されていません!!";
 }
 
 
@@ -178,43 +202,55 @@ h1{
     </ul>
   </nav>
   <div class="container my-0 mx-auto">
-    <h1 class="text-center" style="display:none"><?="チーム".$team['id']?><br>賭けてください<br></h1>
+    <h1 class="text-center" style="display:none"><?="チーム".$team['id']?><br><?=(!empty($bet["flg"]) && $bet["flg"] == 1 ? "解答ありがとうございました!!": "賭けてください")?></h1>
     <form action="" method="post">
       <div id="container" class="mt-5 pt-3 box-container" style="display:none">
         <p class="text-center lead">現在の状態</p><div class="text-danger"><?=(isset($err) ? "ERROR:".$err : "" )?></div>
-        <div class="bg-info pb-3">
+        <div class="pb-3 bg-info">
           <?php if(isset($quiz)): ?>
-            <p class="text-light mt-2 bg-info"><?= 'クイズ名:'.$quiz['title'] ?></p><hr>
+            <!-- <div class="bg-info"> -->
+            <p class="text-light mt-2 bg-info"><?= 'クイズ'.$quiz['id'].':'.$quiz['title'] ?></p><hr>
             <p class="text-light mt-4 bg-info"><?= 'ベットした数:'.$bet['bet'] ?></p><hr>
             <p class="text-light mt-4 bg-info"><?= 'Your answer:'.$bet['answer'] ?></p><hr>
             <p class="text-light mt-4 bg-info"><?= '倍率:'.$quiz['rarity'] ?></p><hr>
             <input type="hidden" name="quiz_id" value="<?= $quiz['id'] ?>">
+          <!-- </div> -->
           <?php endif ; ?>
           <?php if(isset($team)): ?>
-            <p class="text-light mt-4 bg-info"><?= 'あなたのチームのポイント:'.$team['point'] ?></p>
+            <!-- <div class="bg-danger"> -->
+            <p class="text-light mt-4"><?= 'あなたのチームのポイント:'.$team['point'] ?><span class="pl-3"><?=(!empty($disp) ? '(もし正解したらあなたのチームにここから'.$disp.'ポイント加点されます。)' : '')?></span></p>
             <input type="hidden" name="team_id" value="<?= $team['id'] ?>">
+          <!-- </div> -->
           <?php endif ; ?>
           </div>
       </div>
       <div id="container2" class="pt-3 text-center" style="display:none">
-        <h4 class="alert alert-secondary">答えとベット数を選んで<br>送信してください</h4><br>
-        <!-- <div class="text-left w-50 mx-auto"> -->
-          <label for="A"><span class="badge badge-secondary" style="font-weight:bold;">答え</span>A</label>
-          <input type="radio" name="answer" id="A" value="A">
-          <label for="B">B</label>
-          <input type="radio" name="answer" value="B">
-          <label for="C">C</label>
-          <input type="radio" name="answer" value="C">
-          <label for="D">D</label>
-          <input type="radio" name="answer" value="D">
-          <p><span class= "badge badge-secondary" style="font-weight:bold;">ベット数</span>
-          <select name="bet">
-            <?= $option ?>
-          </select><br>
-          </p>
-        <!-- </div> -->
-          <input type="submit" class="btn-primary btn-lg mt-3 pr-5 pl-5" name="submit" onclick="return confirm('※答えとbet数は変更できません!\nファイナルアンサー?');"></input>
-
+        <?php if(empty($bet["flg"])) : ?>
+          <h4 class="alert alert-secondary">1位だと予想するチームと<br>
+            賭けるベット数を選択し<br>
+            送信してください<br>
+            <span class="text-danger h6">・正解するとベットしたポイントの2倍のポイントが加点されます</span></h4><br>
+          <!-- <div class="text-left w-50 mx-auto"> -->
+            <label for="A"><span class="badge badge-secondary" style="font-weight:bold;">答え</span>A</label>
+            <input type="radio" name="answer" id="A" value="A">
+            <label for="B">B</label>
+            <input type="radio" name="answer" value="B">
+            <label for="C">C</label>
+            <input type="radio" name="answer" value="C">
+            <label for="D">D</label>
+            <input type="radio" name="answer" value="D">
+            <p><span class= "badge badge-secondary" style="font-weight:bold;">ベット数</span>
+            <select name="bet">
+              <?= $option ?>
+            </select><br>
+            </p>
+          <!-- </div> -->
+            <input type="submit" class="btn-primary btn-lg mt-3 pr-5 pl-5" name="submit" onclick="return confirm('※答えとbet数は変更できません!\nファイナルアンサー?');"></input>
+          <?php elseif ($bet["flg"] == 1) : ?>
+            <div class="text-danger h5"><?=(isset($quiz_flg) ? "ERROR:".$quiz_flg : "" )?></div>
+            <button type="submit" class="btn-primary btn-lg mt-3 pr-5 pl-5" name="reload">次のゲームへ</button>
+            <!-- <a href="" class="btn-primary btn-lg mt-3 pr-5 pl-5">NEXTゲームへ<a>  -->
+          <?php endif; ?>
       </div>
     </div>
     </form>

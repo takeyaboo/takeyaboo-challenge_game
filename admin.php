@@ -253,4 +253,5 @@ if(isset($_POST["reset"])){
   <input type="submit" name="reset" value="ぜーんぶリセット">
 </form>
 
-<a href="result.php">結果へphp</a>
+<a href="result.php">結果へ(表示用)</a>
+<a href="status.php">ステータスへ(自分用)</a>

@@ -14,17 +14,21 @@ if(empty($_SESSION['id'])){
 if(isset($_POST['calc'])){
   $stmt = $pdo->query ( 'select * from bets where flg = 1 and quiz_id = '.'\''.$_POST['quiz_id'].'\'');
   $teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
-  if(count($teams) >= 1 && isset($_POST['answer'])){
+
+  //チームがXチーム揃ってなければ　ないしは　答えが定義されてなかったら（答えを登録してリロードしてなかったら）
+  if(count($teams) >= 1 && !empty($_POST['answer'])){
     foreach ($teams as $k => $v) {
       $stmt= $pdo->query ( 'select * from teams where id = '.$v['team']);
       $team = $stmt->fetch(PDO::FETCH_ASSOC);
       if($_POST['answer'] == $v['answer']){
         //あってたら
         $add = $v['bet'] * $_POST['rarity'];
+        // $point = $team['point'] + $add + $v['bet'];
         $point = $team['point'] + $add;
       }else{
         //間違ってたら
         $point = $team['point'] - $v['bet'];
+        // $point = $team['point'];
       }
 
       //ポイント反映しまーす
