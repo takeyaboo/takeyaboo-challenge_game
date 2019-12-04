@@ -3,7 +3,7 @@
 require('config.php');
 require('func.php');
 
-session_start();
+// session_start();
 
 //企画中にログアウトするキチガイはいないと思うけど自分用
 

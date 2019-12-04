@@ -5,7 +5,7 @@
 require('config.php');
 require('func.php');
 
-session_start();
+// session_start();
 
 if(!empty($_SESSION['id'])){
   header('Location: bet.php');
@@ -28,7 +28,7 @@ if(isset($_POST['submit'])){
   // print_r($result);
     if($result['login_id'] === $_POST['id'] && $result['pass'] === $_POST['pass']){
       //多重ログイン防止
-      if($result['flg'] == 0){
+      // if($result['flg'] == 0){
         $_SESSION['id'] = $result['login_id'];
         $_SESSION['pass'] = $result['pass'];
         // $_SESSION['auth'] = 1;
@@ -42,9 +42,9 @@ if(isset($_POST['submit'])){
         }
         header('Location: bet.php');
         exit;
-      }else{
-        $err = '既にログインされています';
-      }
+      // }else{
+      //   $err = '既にログインされています';
+      // }
     }else{
       $err = 'ログイン失敗';
     }

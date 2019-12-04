@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+// session_start();
 
 require('config.php');
 require('func.php');
@@ -115,8 +115,29 @@ if(isset($quiz) && isset($team)){
 }
 
 if(isset($_POST['reload'])){
-  $quiz_flg = "まだ次のクイズが発表されていません!!";
+  $quiz_flg = "まだこのクイズが終わっていません!!";
 }
+
+// $chance_arr[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+// $change_arr = array($team['id'], $team['id'] + 1, $team['id'] + 2, $team['id'] + 3)
+
+
+// for($i = 1; $i >= 16; $i++){
+//   if($chance_arr[$i] == $team['id']){
+//     if($i < 5){
+//       $chance
+//     }elseif($i < 9){
+//
+//     }elseif($i < 13){
+//
+//     }else{
+//
+//     }
+//   }
+// }
+// if($team['id'] == $bet['quiz_id'] || $team['id'] = $bet['quiz_id'] + 3){
+//   $chance = 1;
+// }
 
 
 
@@ -218,7 +239,9 @@ h1{
           <?php endif ; ?>
           <?php if(isset($team)): ?>
             <!-- <div class="bg-danger"> -->
-            <p class="text-light mt-4"><?= 'あなたのチームのポイント:'.$team['point'] ?><span class="pl-3"><?=(!empty($disp) ? '(もし正解したらあなたのチームにここから'.$disp.'ポイント加点されます。)' : '')?></span></p>
+            <p class="text-light mt-4"><?= 'あなたのチームのポイント:'.$team['point'] ?>
+              <span class="pl-3"><?=(!empty($disp) ? '<br>(もし正解したらあなたのチームに<br>ここから'.$disp.'ポイント加点されます。)' : '')?>
+                <?=(!empty($chance) ? "<br>さらにこのゲームに勝ったら＋2ポイント加点されます" : "")?></span></p>
             <input type="hidden" name="team_id" value="<?= $team['id'] ?>">
           <!-- </div> -->
           <?php endif ; ?>
@@ -247,7 +270,8 @@ h1{
           <!-- </div> -->
             <input type="submit" class="btn-primary btn-lg mt-3 pr-5 pl-5" name="submit" onclick="return confirm('※答えとbet数は変更できません!\nファイナルアンサー?');"></input>
           <?php elseif ($bet["flg"] == 1) : ?>
-            <div class="text-danger h5"><?=(isset($quiz_flg) ? "ERROR:".$quiz_flg : "" )?></div>
+            <div class="text-danger h5"><?=(isset($quiz_flg) ? $quiz_flg : "" )?></div>
+            <div class="text-danger h5">次のゲームが始まったら<br>↓押してください↓</div>
             <button type="submit" class="btn-primary btn-lg mt-3 pr-5 pl-5" name="reload">次のゲームへ</button>
             <!-- <a href="" class="btn-primary btn-lg mt-3 pr-5 pl-5">NEXTゲームへ<a>  -->
           <?php endif; ?>
