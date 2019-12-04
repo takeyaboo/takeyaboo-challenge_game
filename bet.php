@@ -199,14 +199,14 @@ body{
 
 }
 
-h1{
+/* h1{
   margin-top:10px;
   color: #6cb4e4;
   border: solid 2px #6cb4e4;
   border-radius: 30%;
   background: -webkit-repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
   background: repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
-}
+} */
 
 </style>
 
@@ -217,29 +217,29 @@ h1{
     <!-- <a href="" class="navbar-brand"></a> -->
     <ul class="navbar-nav mr-auto">
       <li class="nav-item"><a href="" class="nav-link"><a href="" class="text-light">・再読込</a></li>
-      <li class="nav-item"><a href="" class="nav-link"><a href="result.php" class="text-light pl-3">・結果ページへ</a></li>
+      <li class="nav-item"><a href="" class="nav-link"><a href="result.php" class="text-light pl-3">・全チーム結果</a></li>
       <li class="nav-item"><a href="" class="nav-link"><a href="logout.php" class="text-light pl-3">・ログアウト</a><li/>
       <!-- <input type="button" value="ページを再読込" onclick="window.location.reload();" /> -->
     </ul>
   </nav>
   <div class="container my-0 mx-auto">
-    <h1 class="text-center" style="display:none"><?="チーム".$team['id']?><br><?=(!empty($bet["flg"]) && $bet["flg"] == 1 ? "解答ありがとうございました!!": "賭けてください")?></h1>
+
     <form action="" method="post">
       <div id="container" class="mt-5 pt-3 box-container" style="display:none">
-        <p class="text-center lead">現在の状態</p><div class="text-danger"><?=(isset($err) ? "ERROR:".$err : "" )?></div>
+        <h1 class="text-center" style="display:none"><?="チーム".$team['id']?><br><?=(!empty($bet["flg"]) && $bet["flg"] == 1 ? "解答ありがとうございました!!": "")?></p></h1>
+        <div class="text-danger text-center"><?=(isset($err) ? "ERROR:".$err : "" )?></div>
         <div class="pb-3 bg-info">
           <?php if(isset($quiz)): ?>
             <!-- <div class="bg-info"> -->
-            <p class="text-light mt-2 bg-info"><?= 'クイズ'.$quiz['id'].':'.$quiz['title'] ?></p><hr>
-            <p class="text-light mt-4 bg-info"><?= 'ベットした数:'.$bet['bet'] ?></p><hr>
-            <p class="text-light mt-4 bg-info"><?= 'Your answer:'.$bet['answer'] ?></p><hr>
-            <p class="text-light mt-4 bg-info"><?= '倍率:'.$quiz['rarity'] ?></p><hr>
+            <p class="text-light mt-2 ml-3 bg-info">クイズ<?=$quiz['id']?>:<span class="pl-2"><?= $quiz['title'] ?></span></p><hr>
+            <p class="text-light mt-4 ml-3 bg-info">ベットした数:<span class="pl-2"><?= 'ベットした数:'.$bet['bet'] ?></span></p><hr>
+            <p class="text-light mt-4 ml-3 bg-info">Your answer:<span class="pl-2"><?= 'Your answer:'.$bet['answer'] ?></span></p><hr>
             <input type="hidden" name="quiz_id" value="<?= $quiz['id'] ?>">
           <!-- </div> -->
           <?php endif ; ?>
           <?php if(isset($team)): ?>
             <!-- <div class="bg-danger"> -->
-            <p class="text-light mt-4"><?= 'あなたのチームのポイント:'.$team['point'] ?>
+            <p class="text-light mt-4 ml-3">あなたのチームのポイント:<span class="pl-2"><?= 'あなたのチームのポイント:'.$team['point'] ?></span>
               <span class="pl-3"><?=(!empty($disp) ? '<br>(もし正解したらあなたのチームに<br>ここから'.$disp.'ポイント加点されます。)' : '')?>
                 <?=(!empty($chance) ? "<br>さらにこのゲームに勝ったら＋2ポイント加点されます" : "")?></span></p>
             <input type="hidden" name="team_id" value="<?= $team['id'] ?>">
@@ -268,7 +268,7 @@ h1{
             </select><br>
             </p>
           <!-- </div> -->
-            <input type="submit" class="btn-primary btn-lg mt-3 pr-5 pl-5" name="submit" onclick="return confirm('※答えとbet数は変更できません!\nファイナルアンサー?');"></input>
+            <input type="submit" class="btn-primary btn-lg mt-3 pr-5 pl-5" name="submit" onclick="return confirm('ファイナルアンサー?');"></input>
           <?php elseif ($bet["flg"] == 1) : ?>
             <div class="text-danger h5"><?=(isset($quiz_flg) ? $quiz_flg : "" )?></div>
             <div class="text-danger h5">次のゲームが始まったら<br>↓押してください↓</div>

@@ -24,23 +24,26 @@ $teams = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <h1 class="text-center bg-primary text-light">結果</h1>
-<h3 class="mt-4">[各チームのポイント]</h3>
-<button class="btn btn-primary"
-    data-toggle="collapse"
-    data-target="#point"
-    aria-expand="false"
-    aria-controls="point">OPEN</button>
-<div class="collapse" id="point">
-  <div class="card card-body">
-    <?php foreach($teams as $key => $team):?>
-      <!-- フラグが立ってる問題に対してベットしたとこのチーム名が出る -->
-      <?php $key += 1 ?>
-        <p><?= $key.'位:チーム'.$team['id']?><span class="pl-5"><?= $team['point'].'ポイント'?></span></p><hr>
-    <?php endforeach;?>
-  </div>
+<div class="text-center">
+  <h3 class="mt-4">[各チームのポイント]</h3>
+  <!-- <button class="btn btn-primary"
+      data-toggle="collapse"
+      data-target="#point"
+      aria-expand="false"
+      aria-controls="point">OPEN</button>
+  <div class="collapse" id="point">
+    <div class="card card-body"> -->
+      <?php foreach($teams as $key => $team):?>
+        <!-- フラグが立ってる問題に対してベットしたとこのチーム名が出る -->
+        <?php $key += 1 ?>
+          <p><?= $key.'位:チーム'.$team['id']?><span class="pl-5"><?= $team['point'].'ポイント'?></span></p><hr>
+      <?php endforeach;?>
+    <!-- </div>
+  </div> -->
+  
+  <a href="admin.php" class="btn btn-secondary mt-5">戻る</a>
 </div>
-<br>
-<a href="admin.php" class="btn btn-secondary mt-5">戻る</a>
+
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
