@@ -9,9 +9,9 @@ require('func.php');
 
 $pdo = pdo();
 
-if(!empty($_SESSION['id'])){
-  echo 'Logoutしました。';
-}
+// if(!empty($_SESSION['id'])){
+//   // echo 'Logoutしました。';
+// }
 
 $sql = 'UPDATE teams SET flg = 0 WHERE login_id = '.'\''.$_SESSION['id'].'\'';
 $pdo->exec($sql);

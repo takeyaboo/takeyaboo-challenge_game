@@ -21,10 +21,17 @@ if(isset($_POST['calc'])){
       $stmt= $pdo->query ( 'select * from teams where id = '.$v['team']);
       $team = $stmt->fetch(PDO::FETCH_ASSOC);
       if($_POST['answer'] == $v['answer']){
+        // $point = $team['point'] + $add + $v['bet'];
         //あってたら
         $add = $v['bet'] * $_POST['rarity'];
-        // $point = $team['point'] + $add + $v['bet'];
+        //元本保証ありver
         $point = $team['point'] + $add;
+
+        //なしver
+        // $point = $team['point'] - $v['bet'];
+        // $point += $add;
+
+
       }else{
         //間違ってたら
         $point = $team['point'] - $v['bet'];

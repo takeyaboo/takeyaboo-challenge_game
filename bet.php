@@ -193,20 +193,24 @@ body{
 }
 
 .box-container {
-  background: #ddd;
+  /* background: #ddd; */
   /* margin-bottom: 5px; */
+  color: #6cb4e4;
   margin-bottom: 60px;
+  background: -webkit-repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
+  background: repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
+}
 
 }
 
-/* h1{
-  margin-top:10px;
+h1{
+  /* margin-top:10px; */
   color: #6cb4e4;
-  border: solid 2px #6cb4e4;
-  border-radius: 30%;
+  /* border: solid 2px #6cb4e4;
+  border-radius: 30%; */
   background: -webkit-repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
   background: repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
-} */
+}
 
 </style>
 
@@ -239,7 +243,7 @@ body{
           <?php endif ; ?>
           <?php if(isset($team)): ?>
             <!-- <div class="bg-danger"> -->
-            <p class="text-light mt-4 ml-3">あなたのチームのポイント:<span class="pl-2"><?= 'あなたのチームのポイント:'.$team['point'] ?></span>
+            <p class="text-light mt-4 ml-3">あなたのチームのポイント:<span class="pl-2"><?= $team['point'] ?></span>
               <span class="pl-3"><?=(!empty($disp) ? '<br>(もし正解したらあなたのチームに<br>ここから'.$disp.'ポイント加点されます。)' : '')?>
                 <?=(!empty($chance) ? "<br>さらにこのゲームに勝ったら＋2ポイント加点されます" : "")?></span></p>
             <input type="hidden" name="team_id" value="<?= $team['id'] ?>">

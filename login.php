@@ -13,6 +13,44 @@ if(!empty($_SESSION['id'])){
 
 $pdo = pdo();
 
+//QR版ログイン
+if(!empty($_GET['id']) && !empty($_GET['pass'])){
+    try {
+    // $pdo = new PDO(DSN, DB_USER, DB_PASS);
+    // $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $stmt = $pdo->prepare('select * from teams where login_id = ?');
+    $stmt->execute(array($_GET['id']));
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+  } catch (Exception $e) {
+    echo $e->getMessage() . PHP_EQL;
+  }
+    // print_r($_GET);
+  // echo $_POST['id'];
+  // print_r($result);
+    if($result['login_id'] === $_GET['id'] && $result['pass'] === $_GET['pass']){
+      //多重ログイン防止
+    //   if($result['flg'] == 0){
+        $_SESSION['id'] = $result['login_id'];
+        $_SESSION['pass'] = $result['pass'];
+        // $_SESSION['auth'] = 1;
+
+        $sql = 'UPDATE teams SET flg = 1 WHERE login_id = '.'\''.$_SESSION['id'].'\'';
+        $pdo->exec($sql);
+
+        if($_SESSION['id'] == 'oreore' && $_SESSION['pass'] == 'takeba'){
+          header('Location: admin.php');
+          exit;
+        }
+        header('Location: bet.php');
+        exit;
+    //   }else{
+    //     $err = '既にログインされています';
+    //   }
+    }else{
+      $err = 'ログイン失敗';
+    }
+}
+
 if(isset($_POST['submit'])){
   try {
     // $pdo = new PDO(DSN, DB_USER, DB_PASS);
