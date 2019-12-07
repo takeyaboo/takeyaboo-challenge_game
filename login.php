@@ -30,11 +30,20 @@ if(!empty($_GET['id']) && !empty($_GET['pass'])){
     if($result['login_id'] === $_GET['id'] && $result['pass'] === $_GET['pass']){
       //多重ログイン防止
     //   if($result['flg'] == 0){
+
+      if(empty($_COOKIE['id'])){
+        $token = "トークン";
+        $token = hash('sha256', $token);
+        setcookie('id', $token, time() + 60 * 60 * 24 * 7);
+
+      }
+
+        if(empty($result['token']) || $result['token'] == $_COOKIE['id']){
+
         $_SESSION['id'] = $result['login_id'];
         $_SESSION['pass'] = $result['pass'];
         // $_SESSION['auth'] = 1;
-
-        $sql = 'UPDATE teams SET flg = 1 WHERE login_id = '.'\''.$_SESSION['id'].'\'';
+        $sql = 'UPDATE teams SET token = '.'\''.$token.'\' ,flg = 1 WHERE login_id = '.'\''.$_SESSION['id'].'\'';
         $pdo->exec($sql);
 
         if($_SESSION['id'] == 'oreore' && $_SESSION['pass'] == 'takeba'){
@@ -43,9 +52,9 @@ if(!empty($_GET['id']) && !empty($_GET['pass'])){
         }
         header('Location: bet.php');
         exit;
-    //   }else{
-    //     $err = '既にログインされています';
-    //   }
+      }else{
+        $err = '既にログインされています';
+      }
     }else{
       $err = 'ログイン失敗';
     }
@@ -67,11 +76,20 @@ if(isset($_POST['submit'])){
     if($result['login_id'] === $_POST['id'] && $result['pass'] === $_POST['pass']){
       //多重ログイン防止
       // if($result['flg'] == 0){
+
+      if(empty($_COOKIE['id'])){
+        $token = "トークン";
+        $token = hash('sha256', $token);
+        setcookie('id', $token, time() + 60 * 60 * 24 * 7);
+      }
+
+        if(empty($result['token']) || $result['token'] == $_COOKIE['id']){
+
         $_SESSION['id'] = $result['login_id'];
         $_SESSION['pass'] = $result['pass'];
         // $_SESSION['auth'] = 1;
 
-        $sql = 'UPDATE teams SET flg = 1 WHERE login_id = '.'\''.$_SESSION['id'].'\'';
+        $sql = 'UPDATE teams SET token = '.'\''.$token.'\' ,flg = 1 WHERE login_id = '.'\''.$_SESSION['id'].'\'';
         $pdo->exec($sql);
 
         if($_SESSION['id'] == 'oreore' && $_SESSION['pass'] == 'takeba'){
@@ -84,8 +102,11 @@ if(isset($_POST['submit'])){
       //   $err = '既にログインされています';
       // }
     }else{
-      $err = 'ログイン失敗';
+      $err = '既にログインされています';
     }
+  }else{
+    $err ='ログイン失敗';
+  }
 }
 
 ?>

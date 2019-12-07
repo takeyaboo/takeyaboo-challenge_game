@@ -13,7 +13,7 @@ $pdo = pdo();
 //   // echo 'Logoutしました。';
 // }
 
-$sql = 'UPDATE teams SET flg = 0 WHERE login_id = '.'\''.$_SESSION['id'].'\'';
+$sql = 'UPDATE teams SET token = null, flg = 0 WHERE login_id = '.'\''.$_SESSION['id'].'\'';
 $pdo->exec($sql);
 
 $_SESSION = array();
@@ -24,6 +24,7 @@ if (ini_get("session.use_cookies")) {
         $params["path"], $params["domain"],
         $params["secure"], $params["httponly"]
     );
+    setcookie('id', '', time() - 60 * 60 * 24 * 7);
 }
 
 session_destroy();

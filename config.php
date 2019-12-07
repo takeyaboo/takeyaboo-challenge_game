@@ -13,8 +13,8 @@ $name = session_name();
     setcookie(
       $name,
       $_COOKIE[$name],
-      time() + 86400
-      // ini_get('session.cookie_path'),
+      time() + 86400,
+      ini_get('session.cookie_path')
       // ini_get('session.cookie_domain'),
       // (bool)ini_get('session.cookie_secure'),
       // (bool)ini_get('session.httponly')

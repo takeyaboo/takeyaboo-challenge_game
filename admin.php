@@ -171,7 +171,7 @@ if(isset($_POST)){
 if(isset($_POST["add"])){
   $stmt= $pdo->query ( 'select * from teams where id = '.'\''.$_POST['win'].'\'');
   $team = $stmt->fetch(PDO::FETCH_ASSOC);
-    $point = $team['point'] + 2;
+    $point = $team['point'] + 5;
 
   //ポイント反映しまーす
   $sql = ' UPDATE teams SET '

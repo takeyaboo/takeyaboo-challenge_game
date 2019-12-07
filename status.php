@@ -5,7 +5,7 @@ require('func.php');
 
 $pdo = pdo();
 
-$stmt = $pdo->query ( 'select * from bets where flg = 1');
+$stmt = $pdo->query ( 'select * from bets where flg = 1 order by team asc');
 $bets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $stmt = $pdo->query ( 'select * from quiz where flg = 1');

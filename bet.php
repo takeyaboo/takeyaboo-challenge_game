@@ -6,7 +6,8 @@ require('config.php');
 require('func.php');
 
 // echo "<a href='./logout.php'>ログアウトはする意味ないです</a><br />";
-
+// setcookie('box', 'val', time() + 60 * 60);
+// echo $_COOKIE['box'];
 if(empty($_SESSION['id'])){
   header('Location:login.php');
 }
@@ -25,68 +26,80 @@ if(isset($_POST['submit'])){
     //画面上に表示されているクイズと実際に登録されている問題が一致しているかチェック
     if($_POST["quiz_id"] == $quiz['id']){
       if(isset($_POST['answer']) && isset($_POST['bet'])){
-        //クイズとチームに対応する情報(bet)を取得
-        $stmt = $pdo->query( 'select * from bets where quiz_id = '. $_POST["quiz_id"] .' and team ='. $_POST["team_id"]);
-        //本来一レコードだけしか取らないが例外に備えて後々処理するために複数取れるようにする
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        //bet数が0~10までかチェック
+        if($_POST['bet'] <= 10 && $_POST['bet'] >= 0){
+          //選択肢がA~Bに改ざんされていないかチェック
+          $select = array('A','B','C','D');
+          if(in_array($_POST['answer'],$select)){
 
-        //何らかの原因で同じチームが同じクイズに複数ベットしていた場合、一つでもflgが立っているものがあればフラグON
-        //仮に一個めが集計済みだったとしても二個目以降はflgが解除されていないと想定（ブラウザバック等の二重送信防止対策）
-        $flg = 0;
-        foreach ($result as $v) {
-          if($v['flg'] == '1'){
-            $flg = 1;
-            break;
+            //クイズとチームに対応する情報(bet)を取得
+            $stmt = $pdo->query( 'select * from bets where quiz_id = '. $_POST["quiz_id"] .' and team ='. $_POST["team_id"]);
+            //本来一レコードだけしか取らないが例外に備えて後々処理するために複数取れるようにする
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            //何らかの原因で同じチームが同じクイズに複数ベットしていた場合、一つでもflgが立っているものがあればフラグON
+            //仮に一個めが集計済みだったとしても二個目以降はflgが解除されていないと想定（ブラウザバック等の二重送信防止対策）
+            $flg = 0;
+            foreach ($result as $v) {
+              if($v['flg'] == '1'){
+                $flg = 1;
+                break;
+              }
+            }
+
+            //フラグが立っていたら挿入できないようにする
+            //立ってたらどの問題に対してどのチームがどの答えにいくら賭けたか挿入
+            if($flg != 1){
+              $sql = 'INSERT INTO bets('
+                  . '  team '
+                  . ', bet '
+                  . ', quiz_id '
+                  . ', answer '
+                  . ', flg '
+                . ' )VALUES( '
+                  . '  :team '
+                  . ', :bet '
+                  . ', :quiz_id '
+                  . ', :answer '
+                  . ', 1 '
+                . ' ) '
+              ;
+
+              $stmt = $pdo->prepare($sql);
+              $stmt->bindParam(':team', $_POST['team_id']);
+              $stmt->bindParam(':bet', $_POST['bet']);
+              $stmt->bindParam(':quiz_id', $_POST['quiz_id']);
+              $stmt->bindParam(':answer', $_POST['answer']);
+              $stmt->execute();
+
+
+
+
+              // $id = $_SESSION['id'];
+              // $stmt = $pdo->query( 'select * from teams where login_id = \''.$id.'\'');
+              // $team = $stmt->fetch(PDO::FETCH_ASSOC);
+              //
+              // $point = $team['point'] - $_POST['bet'];
+              //
+              // $sql = ' UPDATE teams SET '
+              //         .'  point = :point '
+              //         .'WHERE id = :team '
+              // ;
+              // $stmt = $pdo->prepare($sql);
+              // $stmt->bindParam(':point', $point);
+              // $stmt->bindParam(':team', $_POST['team_id']);
+              // $stmt->execute();
+
+              // print_r($result);
+              // print_r($_POST);
+            }else{
+              $err = 'あなた方チーム'.$result[0]['team'].'は'.'クイズ'.$result[0]['quiz_id'].'に'.$result[0]['bet'].'bet済みです!!';
+            }
+          }else{
+            $err = '不正な答えです。';
           }
-        }
-
-        //フラグが立っていたら挿入できないようにする
-        //立ってたらどの問題に対してどのチームがどの答えにいくら賭けたか挿入
-        if($flg != 1){
-          $sql = 'INSERT INTO bets('
-              . '  team '
-              . ', bet '
-              . ', quiz_id '
-              . ', answer '
-              . ', flg '
-            . ' )VALUES( '
-              . '  :team '
-              . ', :bet '
-              . ', :quiz_id '
-              . ', :answer '
-              . ', 1 '
-            . ' ) '
-          ;
-
-          $stmt = $pdo->prepare($sql);
-          $stmt->bindParam(':team', $_POST['team_id']);
-          $stmt->bindParam(':bet', $_POST['bet']);
-          $stmt->bindParam(':quiz_id', $_POST['quiz_id']);
-          $stmt->bindParam(':answer', $_POST['answer']);
-          $stmt->execute();
-
-
-
-
-          // $id = $_SESSION['id'];
-          // $stmt = $pdo->query( 'select * from teams where login_id = \''.$id.'\'');
-          // $team = $stmt->fetch(PDO::FETCH_ASSOC);
-          //
-          // $point = $team['point'] - $_POST['bet'];
-          //
-          // $sql = ' UPDATE teams SET '
-          //         .'  point = :point '
-          //         .'WHERE id = :team '
-          // ;
-          // $stmt = $pdo->prepare($sql);
-          // $stmt->bindParam(':point', $point);
-          // $stmt->bindParam(':team', $_POST['team_id']);
-          // $stmt->execute();
-
-          // print_r($result);
-          // print_r($_POST);
         }else{
-          $err = 'あなた方チーム'.$result[0]['team'].'は'.'クイズ'.$result[0]['quiz_id'].'に'.$result[0]['bet'].'bet済みです!!';
+          $err = '不正なbet数です。';
         }
       }else{
         $err = '答えが未選択です!!';
@@ -196,7 +209,7 @@ body{
   /* background: #ddd; */
   /* margin-bottom: 5px; */
   color: #6cb4e4;
-  margin-bottom: 60px;
+  margin-bottom: 30px;
   background: -webkit-repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
   background: repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
 }
@@ -210,6 +223,12 @@ h1{
   border-radius: 30%; */
   background: -webkit-repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
   background: repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
+}
+
+input[type=radio] {
+  width: 25px;
+  -webkit-transform: scale(1.2);
+  transform: scale(1.2);
 }
 
 </style>
@@ -229,15 +248,15 @@ h1{
   <div class="container my-0 mx-auto">
 
     <form action="" method="post">
-      <div id="container" class="mt-5 pt-3 box-container" style="display:none">
+      <div id="container" class="mt-3 pt-3 box-container" style="display:none">
         <h1 class="text-center" style="display:none"><?="チーム".$team['id']?><br><?=(!empty($bet["flg"]) && $bet["flg"] == 1 ? "解答ありがとうございました!!": "")?></p></h1>
         <div class="text-danger text-center"><?=(isset($err) ? "ERROR:".$err : "" )?></div>
         <div class="pb-3 bg-info">
           <?php if(isset($quiz)): ?>
             <!-- <div class="bg-info"> -->
             <p class="text-light mt-2 ml-3 bg-info">クイズ<?=$quiz['id']?>:<span class="pl-2"><?= $quiz['title'] ?></span></p><hr>
-            <p class="text-light mt-4 ml-3 bg-info">ベットした数:<span class="pl-2"><?= 'ベットした数:'.$bet['bet'] ?></span></p><hr>
-            <p class="text-light mt-4 ml-3 bg-info">Your answer:<span class="pl-2"><?= 'Your answer:'.$bet['answer'] ?></span></p><hr>
+            <p class="text-light mt-4 ml-3 bg-info">ベットした数:<span class="pl-2"><?= $bet['bet'] ?></span></p><hr>
+            <p class="text-light mt-4 ml-3 bg-info">Your answer:<span class="pl-2"><?= $bet['answer'] ?></span></p><hr>
             <input type="hidden" name="quiz_id" value="<?= $quiz['id'] ?>">
           <!-- </div> -->
           <?php endif ; ?>
@@ -245,7 +264,7 @@ h1{
             <!-- <div class="bg-danger"> -->
             <p class="text-light mt-4 ml-3">あなたのチームのポイント:<span class="pl-2"><?= $team['point'] ?></span>
               <span class="pl-3"><?=(!empty($disp) ? '<br>(もし正解したらあなたのチームに<br>ここから'.$disp.'ポイント加点されます。)' : '')?>
-                <?=(!empty($chance) ? "<br>さらにこのゲームに勝ったら＋2ポイント加点されます" : "")?></span></p>
+                <?=(!empty($chance) ? "<br>さらにこのゲームに勝ったら＋5ポイント加点されます" : "")?></span></p>
             <input type="hidden" name="team_id" value="<?= $team['id'] ?>">
           <!-- </div> -->
           <?php endif ; ?>
@@ -283,7 +302,7 @@ h1{
     </div>
     </form>
   </div>
-  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
   <script>
 
   //ブラウザバックしたら強制リロード
