@@ -5,10 +5,14 @@
 require('config.php');
 require('func.php');
 
-// session_start();
+session_start();
 
 if(!empty($_SESSION['id'])){
   header('Location: bet.php');
+  exit;
+}elseif(!empty($_COOKIE['id'])){
+    header('Location: bet.php');
+    exit;
 }
 
 $pdo = pdo();
@@ -32,10 +36,13 @@ if(!empty($_GET['id']) && !empty($_GET['pass'])){
     //   if($result['flg'] == 0){
 
       if(empty($_COOKIE['id'])){
-        $token = "トークン";
-        $token = hash('sha256', $token);
+        // $token = "トークン";
+        // $token = hash('sha256', $token);
+        $token = bin2hex(openssl_random_pseudo_bytes(16));
         setcookie('id', $token, time() + 60 * 60 * 24 * 7);
 
+      }else{
+          $token = $_COOKIE['id'];
       }
 
         if(empty($result['token']) || $result['token'] == $_COOKIE['id']){
@@ -78,9 +85,12 @@ if(isset($_POST['submit'])){
       // if($result['flg'] == 0){
 
       if(empty($_COOKIE['id'])){
-        $token = "トークン";
-        $token = hash('sha256', $token);
+        // $token = "トークン";
+        // $token = hash('sha256', $token);
+        $token = bin2hex(openssl_random_pseudo_bytes(16));
         setcookie('id', $token, time() + 60 * 60 * 24 * 7);
+      }else{
+          $token = $_COOKIE['id'];
       }
 
         if(empty($result['token']) || $result['token'] == $_COOKIE['id']){
@@ -103,6 +113,7 @@ if(isset($_POST['submit'])){
       // }
     }else{
       $err = '既にログインされています';
+      // $err = $_COOKIE['id'];
     }
   }else{
     $err ='ログイン失敗';

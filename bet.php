@@ -1,19 +1,32 @@
 <?php
 
-// session_start();
+session_start();
 
 require('config.php');
 require('func.php');
 
+$pdo = pdo();
+
+if(!empty($_COOKIE['id'])){
+  $_SESSION['flg'] = $_COOKIE['id'];
+  $token = $_SESSION['flg'];
+  $stmt = $pdo->query( 'select * from teams where token = \''.$token.'\'');
+  $team_avalabel = $stmt->fetch(PDO::FETCH_ASSOC);
+  if(empty($team_avalabel)){
+    header('Location:login.php');
+     exit;
+  }
+}
 // echo "<a href='./logout.php'>ログアウトはする意味ないです</a><br />";
 // setcookie('box', 'val', time() + 60 * 60);
 // echo $_COOKIE['box'];
-if(empty($_SESSION['id'])){
+if(empty($_SESSION['flg'])){
   header('Location:login.php');
+   exit;
 }
 // print_r($_SESSION);
 
-$pdo = pdo();
+
 
 //クイズの状態表示用
 $stmt = $pdo->query( 'select * from quiz where flg = 1');
@@ -115,8 +128,9 @@ if(isset($_POST['submit'])){
 // echo $_POST['bet'];
 
 //自分のチームの状態表示用
-$id = $_SESSION['id'];
-$stmt = $pdo->query( 'select * from teams where login_id = \''.$id.'\'');
+//$_SESSION['id']取得してたけどsession消えちゃうからCookieのidを使ってteamを取得
+$id = $_SESSION['flg'];
+$stmt = $pdo->query( 'select * from teams where token = \''.$id.'\'');
 $team = $stmt->fetch(PDO::FETCH_ASSOC);
 
 
@@ -254,7 +268,7 @@ input[type=radio] {
         <div class="pb-3 bg-info">
           <?php if(isset($quiz)): ?>
             <!-- <div class="bg-info"> -->
-            <p class="text-light mt-2 ml-3 bg-info">クイズ<?=$quiz['id']?>:<span class="pl-2"><?= $quiz['title'] ?></span></p><hr>
+            <p class="text-light mt-2 ml-3 bg-info">クイズ名<?=$quiz['id']?>:<span class="pl-2"><?= $quiz['title'] ?></span></p><hr>
             <p class="text-light mt-4 ml-3 bg-info">ベットした数:<span class="pl-2"><?= $bet['bet'] ?></span></p><hr>
             <p class="text-light mt-4 ml-3 bg-info">Your answer:<span class="pl-2"><?= $bet['answer'] ?></span></p><hr>
             <input type="hidden" name="quiz_id" value="<?= $quiz['id'] ?>">
